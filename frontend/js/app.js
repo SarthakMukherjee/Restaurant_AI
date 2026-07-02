@@ -8,7 +8,7 @@
 
   /* ---------------- state ---------------- */
   const state = {
-    apiBase: localStorage.getItem("restu_api_base") || "http://localhost:8000",
+    apiBase: localStorage.getItem("restu_api_base") || "http://localhost:8000" || "https://restaurant-ai-rrul.onrender.com/",
     token: localStorage.getItem("restu_token") || null,
     user: null, // { id, full_name, email, role, is_active, created_at }
     menuItems: [],
