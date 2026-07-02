@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Restu — AI Restaurant Floor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ================= TOP BAR ================= -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="brand-mark">R</span>
+      <span class="brand-name">Restu</span>
+      <span class="brand-tag">AI floor</span>
+    </div>
+
+    <nav class="tabnav" id="tabnav">
+      <button class="tab-btn active" data-tab="menu">Menu</button>
+      <button class="tab-btn" data-tab="recommend">Ask the AI</button>
+      <button class="tab-btn" data-tab="reservations">Reservations</button>
+      <button class="tab-btn" data-tab="feedback">Feedback</button>
+      <button class="tab-btn admin-only hidden" data-tab="admin">Admin</button>
+    </nav>
+
+    <div class="auth-zone" id="authZone">
+      <button class="btn btn-ghost" id="btnShowLogin">Log in</button>
+      <button class="btn btn-brass" id="btnShowRegister">Register</button>
+    </div>
+
+    <div class="user-zone hidden" id="userZone">
+      <div class="user-chip">
+        <span class="user-dot" id="userRoleDot"></span>
+        <span id="userName">—</span>
+      </div>
+      <button class="btn btn-outline" id="btnLogout">Log out</button>
+    </div>
+
+    <button class="settings-btn" id="btnSettings" title="API settings" aria-label="API settings">⚙</button>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Front of house, run on inference</p>
+    <h1>The kitchen still cooks.<br/>The floor now thinks.</h1>
+    <p class="hero-sub">Menu recommendations, reservation parsing and review sentiment — read straight off the pass, printed like a chit.</p>
+  </div>
+  <div class="hero-ticket" aria-hidden="true">
+    <div class="ticket">
+      <div class="ticket-row"><span>TABLE</span><span>07</span></div>
+      <div class="ticket-row"><span>COVERS</span><span>2</span></div>
+      <div class="ticket-row"><span>AI SUGGEST</span><span>✓</span></div>
+      <div class="ticket-tear"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STATUS BAR ================= -->
+<div class="statusbar" id="statusBar"></div>
+
+<main class="app-main">
+
+  <!-- ============== MENU TAB ============== -->
+  <section class="panel active" id="panel-menu">
+    <div class="panel-head">
+      <div>
+        <h2>The board</h2>
+        <p class="panel-sub">Everything currently plated. Admins can edit straight from here.</p>
+      </div>
+      <div class="menu-controls">
+        <select id="categoryFilter">
+          <option value="">All categories</option>
+        </select>
+        <button class="btn btn-brass admin-only hidden" id="btnNewItem">+ New item</button>
+      </div>
+    </div>
+    <div class="grid" id="menuGrid"></div>
+    <p class="empty-note hidden" id="menuEmpty">Nothing on the board yet. Log in and add the first dish.</p>
+  </section>
+
+  <!-- ============== RECOMMEND TAB ============== -->
+  <section class="panel" id="panel-recommend">
+    <div class="panel-head">
+      <div>
+        <h2>Ask the AI sommelier</h2>
+        <p class="panel-sub">Describe a craving in plain language. The model reads the live board and answers.</p>
+      </div>
+    </div>
+    <form class="ask-form" id="recommendForm">
+      <input type="text" id="recommendInput" maxlength="500" placeholder="e.g. Something spicy and not too heavy" required />
+      <button class="btn btn-brass" type="submit">Recommend</button>
+    </form>
+    <div id="recommendResults" class="ticket-stack"></div>
+  </section>
+
+  <!-- ============== RESERVATIONS TAB ============== -->
+  <section class="panel" id="panel-reservations">
+    <div class="panel-head">
+      <div>
+        <h2>Reservation assistant</h2>
+        <p class="panel-sub">Write it the way you'd say it. The AI pulls out day, time and party size.</p>
+      </div>
+    </div>
+    <form class="ask-form" id="reservationForm">
+      <input type="text" id="reservationInput" maxlength="500" placeholder="e.g. Table for 4 this Friday at 7:30pm" required />
+      <button class="btn btn-brass" type="submit">Submit request</button>
+    </form>
+    <div id="reservationResults" class="ticket-stack"></div>
+
+    <div class="subhead-row">
+      <h3>Your past requests</h3>
+      <button class="btn btn-outline btn-sm" id="btnRefreshReservations">Refresh</button>
+    </div>
+    <div id="reservationHistory" class="history-list"></div>
+  </section>
+
+  <!-- ============== FEEDBACK TAB ============== -->
+  <section class="panel" id="panel-feedback">
+    <div class="panel-head">
+      <div>
+        <h2>Table talk</h2>
+        <p class="panel-sub">Leave a review. It's read for sentiment and summarized on submit.</p>
+      </div>
+    </div>
+    <form class="ask-form ask-form-textarea" id="feedbackForm">
+      <textarea id="feedbackInput" maxlength="2000" rows="3" placeholder="Tell us how the meal went..." required></textarea>
+      <button class="btn btn-brass" type="submit">Send feedback</button>
+    </form>
+    <div id="feedbackResults" class="ticket-stack"></div>
+
+    <div class="subhead-row">
+      <h3>Your feedback history</h3>
+      <button class="btn btn-outline btn-sm" id="btnRefreshFeedback">Refresh</button>
+    </div>
+    <div id="feedbackHistory" class="history-list"></div>
+  </section>
+
+  <!-- ============== ADMIN TAB ============== -->
+  <section class="panel" id="panel-admin">
+    <div class="panel-head">
+      <div>
+        <h2>Pass — admin view</h2>
+        <p class="panel-sub">House-wide numbers and every ticket that's come through.</p>
+      </div>
+    </div>
+
+    <div class="stat-row" id="statRow"></div>
+
+    <div class="subhead-row">
+      <h3>All feedback</h3>
+      <button class="btn btn-outline btn-sm" id="btnRefreshAllFeedback">Refresh</button>
+    </div>
+    <div id="allFeedbackList" class="history-list"></div>
+
+    <div class="subhead-row">
+      <h3>Registered users</h3>
+      <button class="btn btn-outline btn-sm" id="btnRefreshUsers">Refresh</button>
+    </div>
+    <div id="userList" class="history-list"></div>
+  </section>
+
+</main>
+
+<!-- ================= AUTH MODAL ================= -->
+<div class="modal-backdrop hidden" id="authModalBackdrop">
+  <div class="modal">
+    <button class="modal-close" id="authModalClose" aria-label="Close">×</button>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="modalTabLogin" data-mode="login">Log in</button>
+      <button class="modal-tab" id="modalTabRegister" data-mode="register">Register</button>
+    </div>
+
+    <form id="loginForm" class="modal-form">
+      <label>Email
+        <input type="email" id="loginEmail" required autocomplete="username" />
+      </label>
+      <label>Password
+        <input type="password" id="loginPassword" required autocomplete="current-password" />
+      </label>
+      <button class="btn btn-brass btn-full" type="submit">Log in</button>
+      <p class="form-error" id="loginError"></p>
+    </form>
+
+    <form id="registerForm" class="modal-form hidden">
+      <label>Full name
+        <input type="text" id="registerName" minlength="2" maxlength="150" required />
+      </label>
+      <label>Email
+        <input type="email" id="registerEmail" required autocomplete="username" />
+      </label>
+      <label>Password
+        <input type="password" id="registerPassword" minlength="8" maxlength="128" required autocomplete="new-password" />
+      </label>
+      <p class="form-hint">At least 8 characters. New accounts are always customer role.</p>
+      <button class="btn btn-brass btn-full" type="submit">Create account</button>
+      <p class="form-error" id="registerError"></p>
+    </form>
+  </div>
+</div>
+
+<!-- ================= MENU ITEM MODAL (admin) ================= -->
+<div class="modal-backdrop hidden" id="itemModalBackdrop">
+  <div class="modal">
+    <button class="modal-close" id="itemModalClose" aria-label="Close">×</button>
+    <h3 id="itemModalTitle">New item</h3>
+    <form id="itemForm" class="modal-form">
+      <input type="hidden" id="itemId" />
+      <label>Name
+        <input type="text" id="itemName" maxlength="150" required />
+      </label>
+      <label>Category
+        <input type="text" id="itemCategory" maxlength="100" required list="categoryList" />
+        <datalist id="categoryList"></datalist>
+      </label>
+      <label>Description
+        <textarea id="itemDescription" rows="2"></textarea>
+      </label>
+      <div class="form-row">
+        <label>Price
+          <input type="number" id="itemPrice" step="0.01" min="0.01" required />
+        </label>
+        <label>Rating
+          <input type="number" id="itemRating" step="0.1" min="0" max="5" value="0" />
+        </label>
+      </div>
+      <label class="checkbox-row">
+        <input type="checkbox" id="itemAvailable" checked />
+        <span>Available on the board</span>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline btn-danger hidden" id="btnDeleteItem">Delete</button>
+        <button type="submit" class="btn btn-brass">Save item</button>
+      </div>
+      <p class="form-error" id="itemError"></p>
+    </form>
+  </div>
+</div>
+
+<!-- ================= SETTINGS MODAL ================= -->
+<div class="modal-backdrop hidden" id="settingsModalBackdrop">
+  <div class="modal">
+    <button class="modal-close" id="settingsModalClose" aria-label="Close">×</button>
+    <h3>API settings</h3>
+    <form id="settingsForm" class="modal-form">
+      <label>Backend base URL
+        <input type="text" id="apiBaseInput" placeholder="http://localhost:8000" />
+      </label>
+      <p class="form-hint">Points the frontend at your FastAPI server. Saved locally in this browser.</p>
+      <button type="submit" class="btn btn-brass btn-full">Save</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
