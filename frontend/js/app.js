@@ -8,7 +8,7 @@
 
   /* ---------------- state ---------------- */
   const state = {
-    apiBase: localStorage.getItem("restu_api_base") || "https://restaurant-ai-rrul.onrender.com/",
+    apiBase: localStorage.getItem("restu_api_base") || "https://restaurant-ai-rrul.onrender.com",
     token: localStorage.getItem("restu_token") || null,
     user: null, // { id, full_name, email, role, is_active, created_at }
     menuItems: [],
@@ -351,7 +351,7 @@
 
   els.settingsForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    const val = els.apiBaseInput.value.trim() || "https://restaurant-ai-rrul.onrender.com/";
+    const val = els.apiBaseInput.value.trim() || "https://restaurant-ai-rrul.onrender.com";
     state.apiBase = val;
     localStorage.setItem("restu_api_base", val);
     closeSettingsModal();
