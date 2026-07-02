@@ -104,7 +104,7 @@ build/
 # ==========================================
 # AI / Model Cache (Future Use)
 # ==========================================
-models/
+# models/
 checkpoints/
 *.onnx
 *.pt
